@@ -6,49 +6,39 @@ include("config.php");
   $message = '';
 
   if (isset($_POST['submit'])) {
-    $ok = true;
 
-    if (!isset($_POST['name']) || $_POST['name'] === '' ) {
-        $ok = false;
-    } else {
+    if (isset($_POST['name']) && isset($_POST['password'])) {
         $name = $_POST['name'];
-    }
-    if (!isset($_POST['password']) || $_POST['password'] === '') {
-        $ok = false;
-    }
-    else {
         $password = $_POST['password'];
-    }
 
-    $password = $_POST['password'];
-    if (preg_match("#.*^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).*$#", $password)){
-        //echo "Your password is strong.";
-    $q1 = mysqli_query($db, "SELECT name From users WHERE name = '$name'");
-    if(mysqli_num_rows($q1) != 0){
-      $message = "We had a problem creating an account ";
-      $ok = false;
-    }
-        if ($ok) {
-            $breaker = '$';
-            $iterations ='1000';
-            $salt = openssl_random_pseudo_bytes(256);
-            #$hash = password_hash($password, PASSWORD_DEFAULT);
-            $hash = hash_pbkdf2("sha256", $password, $salt, $iterations, 256);
+        $existing_user_name = mysqli_query($db, "SELECT user_name From users WHERE user_name = '$name'");
 
-            $saltyHash = $hash;
+        if(mysqli_num_rows($existing_user_name) != 0){
+          $message = "We had a problem creating an account ";
 
-          //  $saltyHash = $breaker.$salt.$breaker.$hash;
-             // add database code here
-            $sql = sprintf("INSERT INTO users (name, password) VALUES (
-              '%s', '%s'
-            )", mysqli_real_escape_string($db, $name),
-                mysqli_real_escape_string($db, $saltyHash));
-            mysqli_query($db, $sql);
-            mysqli_close($db);
-            $message ="User added";
+        }elseif(!preg_match("#.*^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).*$#", $password)){
+          $message = "Shit password mate ";
+        }else{
+
+          $iterations ='1000';
+          $salt = openssl_random_pseudo_bytes(32);
+          $hash = hash_pbkdf2("sha256", $password, $salt, $iterations, 32);
+          $saltyHash = '$'.$salt.'$'.$hash;
+
+           // add database code here
+          $sql = sprintf("INSERT INTO users (user_name, hashed_password ) VALUES (
+            '%s', '%s'
+          )", mysqli_real_escape_string($db, $name),
+              mysqli_real_escape_string($db, $saltyHash));
+          mysqli_query($db, $sql);
+          mysqli_close($db);
+          header("location:login.php");
         }
-      }
+
+
     }
+  }
+
 ?>
 
 <!DOCTYPE html>

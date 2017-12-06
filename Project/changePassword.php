@@ -3,14 +3,38 @@ include("config.php");
 include("session.php")
 
 $message = '';
+$password = '';
+$new_password = '';
+$user_name = $login_session;
+
+  if (isset($_POST['submit'])) {
 
 if (isset($_POST['password']) && isset($_POST['newPassword'])) {
-if ($login_pw != $_POST['password']){
-  echo "No matchy";
-}elseif((!preg_match("#.*^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).*$#", $newPassword))){
+    $password = isset($_POST['password'];
+    $new_password = isset($_POST['password'];
+
+    $salt = "Select hashed_password FROM users WHERE user_name = '$login_session'";
+    $salt_value = mysqli_query($db, $salt);
+    $row = mysqli_fetch_all($salt_value,MYSQLI_ASSOC);
+
+    $returned = $row[0]['hashed_password'];
+
+    $array = explode('$', $returned);
+
+    $iterations ='1000';
+    $hash = hash_pbkdf2("sha256", $password, $array[1], $iterations, 32);
+    $saltyHash = '$'.$array[1].'$'.$hash;
+
+    if ($login_pw != $saltyHash){
+      echo "No matchy";
+}elseif((!preg_match("#.*^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*\W).*$#", $new_password))){
   echo "Complexity ERROR!";
 }else{
-  $query ="UPDATE users SET password = $_POST['newPassword'] WHERE name = $login_session ";
+  $salt = openssl_random_pseudo_bytes(32);
+  $hash = hash_pbkdf2("sha256", $new_password, $salt, $iterations, 32);
+  $saltyHash = '$'.$salt.'$'.$hash;
+
+  $query ="UPDATE users SET hashed_password = $saltyHash WHERE user_name = '$login_session'";
   $result = mysqli_query($db, $query);
   header("location: logout.php");
   }

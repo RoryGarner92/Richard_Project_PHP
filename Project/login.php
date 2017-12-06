@@ -5,35 +5,84 @@ session_start();
 $message = '';
 
 if (isset($_POST['name']) && isset($_POST['password'])) {
+  $ip = $_SERVER['REMOTE_ADDR'];
+  $userAgent = $_SERVER['HTTP_USER_AGENT'];
 
-$ip = $_SERVER["REMOTE_ADDR"];
-mysqli_query($db, "INSERT INTO `ip` (`address` ,`timestamp`)VALUES ('$ip',CURRENT_TIMESTAMP)");
-$result = mysqli_query($db, "SELECT COUNT(*) FROM `ip` WHERE `address` LIKE '$ip' AND `timestamp` > (now() - interval 2 minute)");
-$count = mysqli_fetch_array($result, MYSQLI_NUM);
-echo $count[0];
-if($count[0] > 2){
-  echo "Your are allowed 3 attempts in 10 minutes";
-}
-else{
-$sql = sprintf("SELECT * FROM users WHERE name='%s'",mysqli_real_escape_string($db, $_POST['name']));
-$result = mysqli_query($db, $sql);
+  $hashOfUser = $ip . $userAgent;
+  $iterations = 1000;
 
-$row = mysqli_fetch_assoc($result);
-if ($row) {
-    $saltyHash = $row['password'];
-    $name = $row['name'];
-    if (password_verify($_POST['password'], $saltyHash)) {
-        header("location:home.php");
-        $_SESSION['name'] = $row['name'];
-    } else {
-        $message = 'Login failed.';
-    }
-} else {
-    $message = 'Login failed.';
+  $salt = "salty";
+  $hash = hash_pbkdf2("sha256", $hashOfUser, $salt, $iterations, 32);
+
+  $result = mysqli_query($db,"SELECT COUNT(hashed_user_agent_Ip) AS Count FROM ip WHERE hashed_user_agent_Ip = '$hash' AND `time_stamp` > (now() - interval 5 minute) AND active = True");
+  $row = mysqli_fetch_all($result,MYSQLI_ASSOC);
+
+  if($row[0]['Count'] >= 3)
+      {
+          echo "Your are allowed 3 attempts in 5 minutes";
+      }
+  else
+      {
+          mysqli_query($db, "INSERT INTO `ip` (`hashed_user_agent_Ip` ,`time_stamp`) VALUES ('$hash',CURRENT_TIMESTAMP)");
+          $myusername = filter_var($_POST['name'],FILTER_SANITIZE_STRING);
+          $mypassword = mysqli_real_escape_string($db,$_POST['password']);
+
+          $nameResult = mysqli_query($db,"SELECT id FROM users WHERE user_name = '$myusername'");
+          $nameCount = mysqli_num_rows($nameResult);
+
+  if($row[0]['Count']>2){
+    echo "Your are only allowed 3 attempts! Try back later..";
+  }else{
+    mysqli_query($db, "INSERT INTO `ip` (`hashed_user_agent_Ip` ,`times_stamp`) VALUES ('$hash',CURRENT_TIMESTAMP)");
+    $myusername = filter_var($_POST['name'],FILTER_SANITIZE_STRING);
+    $mypassword = mysqli_real_escape_string($db,$_POST['password']);
+
+    $nameResult = mysqli_query($db,"SELECT id FROM users WHERE user_name = '$myusername'");
+    $nameCount = mysqli_num_rows($nameResult);
+
+if($nameCount == 1)
+{
+    // Generate a random IV using openssl_random_pseudo_bytes()
+    // random_bytes() or another suitable source of randomness
+    $salt = "SELECT hashed_password FROM users WHERE user_name = '$myusername'";
+    $saltReturn = mysqli_query($db,$salt);
+    $row = mysqli_fetch_all($saltReturn,MYSQLI_ASSOC);
+
+    $returned =  $row[0]['hashed_password'];
+
+    $array =  explode( '$', $returned );
+
+    $iterations = 1000;
+    $hash = hash_pbkdf2("sha256", $mypassword, $array[1], $iterations, 32);
+    $saltyHash = '$' . $array[1] . '$' . $hash;
+
+    $sql = "SELECT id FROM users WHERE user_name = '$myusername' and hashed_password = '$saltyHash'";
+    $result = mysqli_query($db,$sql);
+    $count = mysqli_num_rows($result);
+    echo $count;
+
+    // If result matched $myusername and $mypassword, table row must be 1 row
+    $query = "UPDATE ip SET active = False ";
+    $result = mysqli_query($db,$query);
+
+    if($count == 1) {
+          $_SESSION['user_name'] = $myusername;
+
+          header("location:home.php");
+        }
+}
+else
+{
+$error = "Your Username($myusername) or Password is invalid";
+echo "not correct";
 }
 }
+}
+
+
 mysqli_close($db);
 }
+#}
 ?>
 
 <!DOCTYPE html>

@@ -6,7 +6,7 @@ Number: C00193506
 <?php
       include("config.php");
       include("session.php");
-
+      //including the session and config
       $message = '';
 
       if(isset($_POST['submit'])) {
@@ -16,14 +16,13 @@ Number: C00193506
           $password2 = $_POST['password2'];
           $password1 = $_POST['password1'];
           $user_name = $login_session;
-
+          // setting the vars
           $salt = "SELECT hashed_password FROM users WHERE user_name = '$user_name'";
           $salt_returned = mysqli_query($db,$salt);
           $row = mysqli_fetch_all($salt_returned,MYSQLI_ASSOC);
 
           $returned =  $row[0]['hashed_password'];
           $array =  explode( '$', $returned );
-            //$returned =  $row[0]['Salt'];
           $iterations = 1000;
           $hash = hash_pbkdf2("sha256", $password1, $array[1], $iterations, 32);
           $salty_hash = '$' . $array[1] . '$' . $hash;

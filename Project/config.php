@@ -10,4 +10,5 @@ Number: C00193506
       $database ='logindb';
 
       $db = new mysqli($host,$user,$password,$database) or die('Cannot Connect');
+      //connecting to the database
  ?>

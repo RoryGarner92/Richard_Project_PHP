@@ -6,25 +6,26 @@ Number: C00193506
 <?php
       include("config.php");
       session_start();
-
+      // function to start session
       $message = '';
 
       if($_SERVER["REQUEST_METHOD"] == "POST"){
         $ip = $_SERVER['REMOTE_ADDR'];
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
-
+        //collecting info of user logging in
         $hash_of_user = $ip . $user_agent;
         $iterations = 1000;
-
         $salt = "salty";
         $hash = hash_pbkdf2("sha256", $hash_of_user, $salt, $iterations, 32);
+        //hashing the info collect before storing it in the db
         $result = mysqli_query($db,"SELECT COUNT(hashed_user_agent_Ip) AS Count FROM ip WHERE hashed_user_agent_Ip = '$hash' AND `time_stamp` > (now() - interval 10 minute) AND active = True");
         $row = mysqli_fetch_all($result,MYSQLI_ASSOC);
-
+        // checking the number of attempted logins
       if($row[0]['Count'] >= 3){
         $message = "You hare limited to 3 attempts ! You are now locked out for 10 minutes";
       }else{
         mysqli_query($db, "INSERT INTO `ip` (`hashed_user_agent_Ip` ,`time_stamp`) VALUES ('$hash',CURRENT_TIMESTAMP)");
+        //inserts into the ip table
         $sanitized_user_name = filter_var($_POST['name'],FILTER_SANITIZE_STRING);
         $real_escape_password = mysqli_real_escape_string($db,$_POST['password']);
 
@@ -59,7 +60,6 @@ Number: C00193506
   mysqli_close($db);
 }
 ?>
-
 
 <!DOCTYPE html>
 <html>

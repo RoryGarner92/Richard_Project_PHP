@@ -5,8 +5,8 @@ Number: C00193506
 -->
 <?php
       include("session.php");
+      //connecting to session
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">

@@ -9,4 +9,5 @@ Number: C00193506
       if(session_destroy()){
         header("location:home.php");
       }
+      //destroys the session and redirests to login
  ?>

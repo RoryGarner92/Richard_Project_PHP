@@ -53,6 +53,8 @@ $conn->close();
 <body>
 <form action="" method="post">
 <button type="submit" class="btn btn-success btn-block" value="Create">Create</button>
+<input type= "button" class="btn btn-success btn-block"  value= "Login" onclick="window.location.href='login.php'"/>
+
 </form>
 </body>
 </html>

@@ -10,9 +10,8 @@ Number: C00193506
       $message = '';
 
       if(isset($_POST['submit'])) {
-
       if(isset($_POST['password1']) && isset($_POST['password2'])){
-
+      // is form submitted and both sections filled  !null  then (do code)
           $password2 = $_POST['password2'];
           $password1 = $_POST['password1'];
           $user_name = $login_session;
@@ -23,21 +22,26 @@ Number: C00193506
 
           $returned =  $row[0]['hashed_password'];
           $array =  explode( '$', $returned );
+          //salt was appended to password as requested splits on the '$'
           $iterations = 1000;
+          //number of times to run through algo (proof of concept- must be a much larger number)
           $hash = hash_pbkdf2("sha256", $password1, $array[1], $iterations, 32);
+          //selecting hash algo & running
           $salty_hash = '$' . $array[1] . '$' . $hash;
-
+          //appending
           if($login_pw != $salty_hash){
             $message = 'No Match !';
           }elseif((!preg_match("#.*^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$#", $password2))){
             $message = "Complexity ERROR!";
           }else{
             $salt = openssl_random_pseudo_bytes(32);
+            //gen random salt size 32 bytes (256 bits (must match sha_256))
             $hash = hash_pbkdf2("sha256", $password2, $salt, $iterations, 32);
             $salt_hash = '$'.$salt.'$'.$hash;
 
             $query ="UPDATE users SET hashed_password = '$salt_hash' WHERE user_name = '$login_session'";
             $result = mysqli_query($db, $query);
+            //update db
             header("location: logout.php");
           }
         }

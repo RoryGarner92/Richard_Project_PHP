@@ -16,6 +16,7 @@ Number: C00193506
         $hash_of_user = $ip . $user_agent;
         $iterations = 1000;
         $salt = "salty";
+        //simple salt (this info not overly sensative)
         $hash = hash_pbkdf2("sha256", $hash_of_user, $salt, $iterations, 32);
         //hashing the info collect before storing it in the db
         $result = mysqli_query($db,"SELECT COUNT(hashed_user_agent_Ip) AS Count FROM ip WHERE hashed_user_agent_Ip = '$hash' AND `time_stamp` > (now() - interval 10 minute) AND active = True");
@@ -28,23 +29,25 @@ Number: C00193506
         //inserts into the ip table
         $sanitized_user_name = filter_var($_POST['name'],FILTER_SANITIZE_STRING);
         $real_escape_password = mysqli_real_escape_string($db,$_POST['password']);
-
+        // stops the use of "the bad chars"
         $salt = "SELECT hashed_password FROM users WHERE user_name = '$sanitized_user_name'";
         $salt_return = mysqli_query($db,$salt);
         $row = mysqli_fetch_all($salt_return,MYSQLI_ASSOC);
         $arr = (array)$row;
-
+        //checking if it exists
       if(empty($arr)){
         $message = "Your name($sanitized_user_name) or Password is invalid";
       }else{
         $returned = $row[0]['hashed_password'];
         $array =  explode( '$', $returned );
         $iterations = 1000;
+        //number of times to run through algo (proof of concept- must be a much larger number)
         $hash = hash_pbkdf2("sha256", $real_escape_password, $array[1], $iterations, 32);
         $salty_hash = '$' . $array[1] . '$' . $hash;
+        //appending salt
         $name_result = mysqli_query($db,"SELECT id FROM users WHERE user_name = '$sanitized_user_name' AND hashed_password = '$salty_hash'");
         $name_count = mysqli_num_rows($name_result);
-
+        // check db
       if($name_count == 1){
         $result = mysqli_query($db,"SELECT id FROM users WHERE user_name = '$sanitized_user_name' AND hashed_password = '$salty_hash'");
         $count = mysqli_num_rows($result);

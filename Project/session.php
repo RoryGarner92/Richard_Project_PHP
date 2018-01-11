@@ -6,7 +6,7 @@ Number: C00193506
 <?php
        include('config.php');
        session_start();
-
+      //function to start session
        $user_check = $_SESSION['name'];
 
        $session_check = mysqli_query($db, "SELECT user_name From users WHERE user_name = '$user_check'");

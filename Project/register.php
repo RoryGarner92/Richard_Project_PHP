@@ -11,13 +11,11 @@ Number: C00193506
       $message = '';
 
       if(isset($_POST['submit'])){
-
         if(isset($_POST['name']) && isset($_POST['password'])){
           $name = $_POST['name'];
           $password = $_POST['password'];
-
           $existing_user_name = mysqli_query($db, "SELECT user_name From users WHERE user_name = '$name'");
-
+          //checks for name
         if(mysqli_num_rows($existing_user_name) != 0){
           $message = "We had a problem creating an account ";
         }elseif(!preg_match("#.*^(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).*$#", $password)){
@@ -27,7 +25,7 @@ Number: C00193506
           $salt = openssl_random_pseudo_bytes(32);
           $hash = hash_pbkdf2("sha256", $password, $salt, $iterations, 32);
           $salty_hash = '$'.$salt.'$'.$hash;
-                 // add database code here
+          // add database code here
           $sql = sprintf("INSERT INTO users (user_name, hashed_password ) VALUES (
             '%s', '%s')", mysqli_real_escape_string($db, $name),
             mysqli_real_escape_string($db, $salty_hash));

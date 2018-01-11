@@ -7,22 +7,22 @@ $conn = new mysqli($host,$user,$password) or die('Cannot Connect');
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
-} 
+}
 if($_SERVER["REQUEST_METHOD"] == "POST"){
 // Create database
 $sql = "CREATE DATABASE logindb";
 
-$createUserTable = "CREATE TABLE `users` ( 
-    `id` int(11)NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-    `user_name` varchar(20) NOT NULL, 
-    `hashed_password` varchar(500) CHARACTER SET utf8mb4 NOT NULL ) 
+$createUserTable = "CREATE TABLE `users` (
+    `id` int(11)NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `user_name` varchar(20) NOT NULL,
+    `hashed_password` varchar(500) CHARACTER SET utf8mb4 NOT NULL )
      ENGINE=InnoDB DEFAULT CHARSET=latin1";
 
-$createIpTable = "CREATE TABLE IF NOT EXISTS `ip`( 
-    `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT, 
-    `hashed_user_agent_Ip` varchar(200) CHARACTER SET utf8 NOT NULL, 
-    `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-    `active` tinyint(1) NOT NULL DEFAULT '1' ) 
+$createIpTable = "CREATE TABLE IF NOT EXISTS `ip`(
+    `id` int(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    `hashed_user_agent_Ip` varchar(200) CHARACTER SET utf8 NOT NULL,
+    `time_stamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `active` tinyint(1) NOT NULL DEFAULT '1' )
      ENGINE=InnoDB DEFAULT CHARSET=latin1";
 
 
@@ -37,7 +37,7 @@ if ($conn->query($sql) === TRUE) {
 }
 
 }
-
+// extra ask not in spec  php function to create tables and db if not there onClick
 $conn->close();
 
 ?>

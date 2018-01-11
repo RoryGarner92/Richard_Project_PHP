@@ -24,7 +24,7 @@ Number: C00193506
      </div>
      <ul class="nav navbar-nav">
        <li class="active"><a href="home.php">Home</a></li>
-       <li><a href="about.phph">About</a></li>
+       <li><a href="about.php">About</a></li>
        <li><a href="#">Page 2</a></li>
      </ul>
      <ul class="nav navbar-nav navbar-right">

@@ -8,6 +8,7 @@ Number: C00193506
       session_start();
       // function to start session
       $message = '';
+      $count = 0;
 
       if($_SERVER["REQUEST_METHOD"] == "POST"){
         $ip = $_SERVER['REMOTE_ADDR'];
@@ -57,7 +58,10 @@ Number: C00193506
       if($count == 1){
         $_SESSION['name'] = $sanitized_user_name;
         header("location:home.php");
+      }else {
+
       }
+
     }
   }
   mysqli_close($db);

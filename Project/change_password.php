@@ -65,7 +65,7 @@ Number: C00193506
      <ul class="nav navbar-nav">
        <li class="active"><a href="home.php">Home</a></li>
        <li><a href="about.php">About</a></li>
-       <li><a href="#">Page 2</a></li>
+       <li><a href="page2.html">Page 2</a></li>
      </ul>
      <ul class="nav navbar-nav navbar-right">
        <li><a href="change_password.php"><span class="glyphicon glyphicon-user"></span>Change Password</a></li>
@@ -80,8 +80,6 @@ Number: C00193506
     <input  type="password" name="password1" placeholder="PASSWORD">
     <label>New Password</label>
     <input  type="password" name="password2" placeholder="NEW PASSWORD">
-    <label>Confirm Password</label>
-    <input  type="password" name="confirm" placeholder="CONFIRM PASSWORD">
     <input  type="submit" name="submit" value="Submit">
   </form>
 </div>

@@ -26,7 +26,7 @@ Number: C00193506
      <ul class="nav navbar-nav">
        <li class="active"><a href="home.php">Home</a></li>
        <li><a href="about.php">About</a></li>
-       <li><a href="#">Page 2</a></li>
+       <li><a href="page2.php">Page 2</a></li>
      </ul>
      <ul class="nav navbar-nav navbar-right">
        <li><a href="change_password.php"><span class="glyphicon glyphicon-user"></span>Change Password</a></li>
